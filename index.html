@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Festejando a União: Campo e Cidade</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(#003305, #003305);
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      color: #2e7d32;
+    }
+    .container {
+      background: white;
+      border-radius: 15px;
+      max-width: 700px;
+      margin: auto;
+      padding: 25px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+    #chat {
+      text-align: left;
+      padding: 10px;
+      min-height: 220px;
+    }
+    .button {
+      padding: 10px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #4caf50;
+      color: white;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .button:hover {
+      background-color: #388e3c;
+    }
+    .quiz-box {
+      display: none;
+      margin-top: 20px;
+      transition: opacity 0.5s;
+    }
+    .question {
+      font-size: 22px;
+      margin: 20px 0;
+    }
+    .progress {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #444;
+    }
+    .result {
+      font-size: 20px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .result.correta {
+      color: green;
+    }
+    .result.errada {
+      color: red;
+    }
+    .score {
+      font-size: 18px;
+      margin-top: 10px;
+    }
+    .answer-button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background-color: #4caf50;
+      color: white;
+    }
+    .answer-button:hover {
+      background-color: #388e3c;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container" id="historia">
+    <h1>📱 Festejando a União: Campo e Cidade</h1>
+    <div id="chat"></div>
+    <button class="button" id="startBtn" style="display:none;" onclick="iniciarJogo()">Começar o Jogo</button>
+  </div>
+
+  <div class="container quiz-box" id="quiz">
+    <div class="progress" id="progress">Pergunta 1 de 10</div>
+    <div class="question" id="question">Carregando pergunta...</div>
+    <div>
+      <button class="answer-button" onclick="responder('campo')"> 🌱Campo</button>
+      <button class="answer-button" onclick="responder('cidade')">🏙️ Cidade</button>
+      <button class="answer-button" onclick="responder('ambos')">🤝 Ambos</button>
+    </div>
+    <div class="result" id="result"></div>
+    <div class="score" id="score">Pontuação: 0</div>
+    <button class="button" style="margin-top:20px; display:none" id="restartBtn" onclick="reiniciarJogo()">Jogar Novamente</button>
+  </div>
+
+  <audio id="audioCerto" src="https://www.myinstants.com/media/sounds/correct.mp3"></audio>
+  <audio id="audioErrado" src="https://www.myinstants.com/media/sounds/wrong.mp3"></audio>
+
+  <script>
+    // Conversa estilo Instagram Direct
+    const dialogos = [
+      { nome: "maria", avatar: "img/fazendeira.jpg", texto: "A vida no campo é cheia de trabalho, mas cheia de natureza e alimentos fresquinhos!" },
+      { nome: "carlos", avatar: "img/homemcidade.avif", texto: "Que legal, João! Aqui na cidade temos hospitais, transporte, tecnologia... mas dependemos muito do campo!" },
+      { nome: "maria", avatar: "img/fazendeira.jpg", texto: "O leite que você toma vem da minha fazenda. E o celular que eu uso só existe graças à cidade!" },
+      { nome: "carlos", avatar: "img/homemcidade.avif", texto: "É por isso que devemos celebrar a união entre o campo e a cidade! Um completa o outro!" }
+    ];
+
+    let dialogoIndex = 0;
+
+    function mostrarMensagens() {
+      if (dialogoIndex < dialogos.length) {
+        const fala = dialogos[dialogoIndex];
+        const chat = document.getElementById("chat");
+
+        const linha = document.createElement("div");
+        linha.style.display = "flex";
+        linha.style.alignItems = "center";
+        linha.style.marginBottom = "10px";
+        linha.style.opacity = 0;
+        linha.style.transition = "opacity 0.5s ease";
+
+        const img = document.createElement("img");
+        img.src = fala.avatar;
+        img.alt = fala.nome;
+        img.style.width = "40px";
+        img.style.height = "40px";
+        img.style.borderRadius = "50%";
+        img.style.marginRight = "10px";
+
+        const msg = document.createElement("div");
+        msg.innerHTML = `<strong>${fala.nome}:</strong> ${fala.texto}`;
+        msg.style.background = "#f1f1f1";
+        msg.style.padding = "10px 15px";
+        msg.style.borderRadius = "15px";
+        msg.style.maxWidth = "80%";
+
+        linha.appendChild(img);
+        linha.appendChild(msg);
+        chat.appendChild(linha);
+
+        // Scroll automático para a última mensagem
+        chat.scrollTop = chat.scrollHeight;
+
+        // Fade in suave
+        setTimeout(() => {
+          linha.style.opacity = 1;
+        }, 100);
+
+        dialogoIndex++;
+        setTimeout(mostrarMensagens, 2500); // Próxima fala em 2,5s
+      } else {
+        document.getElementById("startBtn").style.display = "inline-block";
+      }
+    }
+
+    // Perguntas elaboradas
+    const perguntas = [
+      {
+        texto: "Onde é mais comum a produção de alimentos como arroz, feijão e milho?",
+        resposta: "campo"
+      },
+      {
+        texto: "Onde geralmente se concentram os hospitais, universidades e grandes empresas?",
+        resposta: "cidade"
+      },
+      {
+        texto: "Quem depende da produção rural para ter alimentos frescos diariamente?",
+        resposta: "ambos"
+      },
+      {
+        texto: "Qual ambiente é responsável por fornecer tecnologias e inovações que ajudam o agricultor a produzir mais?",
+        resposta: "cidade"
+      },
+      {
+        texto: "Quem colabora diretamente para o abastecimento dos supermercados nas cidades?",
+        resposta: "campo"
+      },
+      {
+        texto: "Quem se beneficia com o desenvolvimento sustentável e equilibrado entre o rural e o urbano?",
+        resposta: "ambos"
+      },
+      {
+        texto: "Onde as pessoas têm mais contato direto com a natureza e com os ciclos da terra?",
+        resposta: "campo"
+      },
+      {
+        texto: "Quem utiliza transporte público e serviços digitais para facilitar o dia a dia?",
+        resposta: "cidade"
+      },
+      {
+        texto: "Quem precisa colaborar para reduzir o desperdício de alimentos e proteger o meio ambiente?",
+        resposta: "ambos"
+      },
+      {
+        texto: "Quem pode trabalhar com agricultura familiar, feiras e cooperativas para fortalecer a economia local?",
+        resposta: "campo"
+      }
+    ];
+
+    let indice = 0;
+    let pontuacao = 0;
+
+    function iniciarJogo() {
+      document.getElementById('historia').style.display = 'none';
+      document.getElementById('quiz').style.display = 'block';
+      mostrarPergunta();
+    }
+
+    function mostrarPergunta() {
+      const perguntaAtual = indice + 1;
+      const total = perguntas.length;
+      document.getElementById("progress").textContent = `Pergunta ${perguntaAtual} de ${total}`;
+      document.getElementById("result").textContent = "";
+
+      if (indice < perguntas.length) {
+        document.getElementById("question").textContent = perguntas[indice].texto;
+      } else {
+        document.getElementById("question").textContent = `🎊 Fim do jogo! Sua pontuação final foi: ${pontuacao} pontos`;
+        document.querySelectorAll(".answer-button").forEach(btn => btn.style.display = "none");
+        document.getElementById("score").style.display = "none";
+        document.getElementById("progress").style.display = "none";
+        document.getElementById("restartBtn").style.display = "inline-block";
+      }
+    }
+
+    function responder(resposta) {
+      const correta = perguntas[indice].resposta;
+      const result = document.getElementById("result");
+
+      if (resposta === correta) {
+        pontuacao += 10;
+        result.textContent = "✔️ Resposta correta! +10 pontos";
+        result.className = "result correta";
+        document.getElementById("audioCerto").play();
+      } else {
+        result.textContent = `❌ Resposta errada! A certa era: ${correta}`;
+        result.className = "result errada";
+        document.getElementById("audioErrado").play();
+      }
+
+      document.getElementById("score").textContent = `Pontuação: ${pontuacao}`;
+      indice++;
+      setTimeout(mostrarPergunta, 1500);
+    }
+
+    function reiniciarJogo() {
+      indice = 0;
+      pontuacao = 0;
+      document.querySelectorAll(".answer-button").forEach(btn => btn.style.display = "inline-block");
+      document.getElementById("score").style.display = "block";
+      document.getElementById("progress").style.display = "block";
+      document.getElementById("restartBtn").style.display = "none";
+      mostrarPergunta();
+    }
+
+    window.onload = mostrarMensagens;
+  </script>
+
+</body>
+</html>
